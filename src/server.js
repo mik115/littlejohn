@@ -2,6 +2,8 @@ const express = require('express');
 const logger = require('pino')();
 
 const config = require('./config');
+const authRoutes = require('./auth');
+const ticker = require('./ticker');
 
 function startServer() {
     const app = express();
@@ -9,14 +11,12 @@ function startServer() {
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
-    app.get('/', (req, res) => {
-        res.send('Hello World!');
-    });
+    app.use('/auth', authRoutes.router);
+    app.use('/tickers', authRoutes.authMiddleware, ticker.router);
 
     app.listen(port, () => {
         logger.child({ port }).info('Webserver started');
     });
-    return app;
 }
 
 module.exports = {
